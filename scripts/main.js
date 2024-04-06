@@ -12,6 +12,13 @@ let vy = 0;
 const playerSize = 100;
 let score = 0;
 let coins = [];
+let gameStarted = false;
+let enemy = {
+    x: 0,
+    y: 0,
+    size: 80,
+    speed: 3
+};
 
 function generateCoins(canvas, ctx) {
     const coinSize = 75;
@@ -65,7 +72,19 @@ function updateGame(checkCoinCollision) {
     if (y + playerSize > canvas.height) y = canvas.height - playerSize;
     ctx.fillStyle = 'orange'; 
     ctx.fillRect(x, y, playerSize, playerSize);
- 
+
+    // Move enemy towards the player
+    if (gameStarted) {
+        if (x < enemy.x) enemy.x -= enemy.speed;
+        if (x > enemy.x) enemy.x += enemy.speed;
+        if (y < enemy.y) enemy.y -= enemy.speed;
+        if (y > enemy.y) enemy.y += enemy.speed;
+    }
+
+    // Draw the enemy
+    ctx.fillStyle = 'red';
+    ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+
     coins.forEach((coin) => {
         if (!coin.collected) {
             ctx.beginPath();
@@ -78,6 +97,12 @@ function updateGame(checkCoinCollision) {
 
     checkCoinCollision(x, y, playerSize);
 
+    // Check collision with the enemy
+    if (Math.abs(x - enemy.x) < playerSize && Math.abs(y - enemy.y) < playerSize) {
+        gameOver();
+        return;
+    }
+
     ctx.font = `${canvas.width * 0.05}px Arial`;
     const textWidth = ctx.measureText('Score: ' + score).width;
     const centerX = canvas.width / 2;
@@ -88,24 +113,59 @@ function updateGame(checkCoinCollision) {
 
     requestAnimationFrame(() => updateGame(checkCoinCollision));
 }
-let gameStarted = false; // Add this line at the beginning of your script
+
+function gameOver() {
+    gameStarted = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'red';
+    ctx.font = `${canvas.width * 0.1}px Arial`;
+
+    // Display "Game Over!" message at the top
+    ctx.fillText('Game Over!', canvas.width * 0.25, canvas.height * 0.3);
+
+    // Display player's score below the "Game Over!" message
+    ctx.font = `${canvas.width * 0.05}px Arial`;
+    ctx.fillStyle = 'white';
+    ctx.fillText(`Score: ${score}`, canvas.width * 0.4, canvas.height * 0.4);
+
+    // Display "Press Spacebar to Play Again" instruction at the bottom
+    ctx.font = `${canvas.width * 0.03}px Arial`;
+    ctx.fillText('Press Spacebar to Play Again', canvas.width * 0.32, canvas.height * 0.7);
+
+    // Reset coins array to remove all coins from the screen
+    coins = [];
+}
+
+
 
 function initializeGame() {
     const gameMessage = document.getElementById('gameMessage');
     gameMessage.style.display = 'block';
     window.addEventListener('keydown', function(e) {
-        if (e.code === 'Space' && !gameStarted) { // Check if the game has started
-            gameStarted = true; // Set gameStarted to true when the game starts
+        if (e.code === 'Space' && !gameStarted) {
+            gameStarted = true;
             gameMessage.style.display = 'none';
             x = canvas.width / 2 - playerSize / 2;
             y = canvas.height / 2 - playerSize / 2;
             score = 0;
+            enemy = getRandomPositionAwayFromPlayer();
             const { checkCoinCollision } = generateCoins(canvas, ctx);
             updateGame(checkCoinCollision);
         }
     });
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+}
+
+function getRandomPositionAwayFromPlayer() {
+    let enemyX, enemyY;
+    do {
+        enemyX = Math.random() * canvas.width;
+        enemyY = Math.random() * canvas.height;
+    } while (Math.abs(enemyX - x) < 200 && Math.abs(enemyY - y) < 200);
+    return { x: enemyX, y: enemyY, size: enemy.size, speed: enemy.speed };
 }
 
 function handleKeyDown(e) {
