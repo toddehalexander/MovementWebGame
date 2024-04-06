@@ -1,21 +1,42 @@
-canvas {
-    border: 1px solid black;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
 }
+
+canvas {
+    border: 2px solid #ffffff;
+    display: block;
+    margin: auto;
+}
+
 #gameCanvasContainer {
     position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 #gameMessage {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.1);
     padding: 20px;
-    display: none;
+    text-align: center;
 }
+
 #gameCanvas {
-    width: 90vw; /* 75% of the viewport width */
-    display: block; /* Ensures the canvas is displayed as a block element */
-    margin: auto; /* Centers the canvas horizontally within its container */
+    width: 80vw;
+    border-radius: 10px;
+}
+
+#gameMessage p {
+    font-size: 18px;
 }
 

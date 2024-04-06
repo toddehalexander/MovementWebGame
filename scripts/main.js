@@ -63,9 +63,9 @@ function updateGame(checkCoinCollision) {
     if (x + playerSize > canvas.width) x = canvas.width - playerSize;
     if (y < 0) y = 0;
     if (y + playerSize > canvas.height) y = canvas.height - playerSize;
-    ctx.fillStyle = 'orange';
+    ctx.fillStyle = 'orange'; 
     ctx.fillRect(x, y, playerSize, playerSize);
-
+ 
     coins.forEach((coin) => {
         if (!coin.collected) {
             ctx.beginPath();
@@ -78,12 +78,12 @@ function updateGame(checkCoinCollision) {
 
     checkCoinCollision(x, y, playerSize);
 
-    ctx.font = `${canvas.width * 0.03}px Arial`;
+    ctx.font = `${canvas.width * 0.05}px Arial`;
     const textWidth = ctx.measureText('Score: ' + score).width;
     const centerX = canvas.width / 2;
     const textX = centerX - textWidth / 2;
     const textY = canvas.height - canvas.width * 0.03;
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'brown';
     ctx.fillText('Score: ' + score, textX, textY);
 
     requestAnimationFrame(() => updateGame(checkCoinCollision));
