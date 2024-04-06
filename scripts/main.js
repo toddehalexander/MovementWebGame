@@ -24,12 +24,13 @@ let enemy = {
 const bgMusic = document.getElementById('bgMusic');
 bgMusic.loop = true;
 
-// Create an audio element for death sound
+// Create audio elements for game sounds
 const deathSound = new Audio('audio/Death.mp3');
+const coinCollectedSound = new Audio('audio/CoinCollected.mp3');
 
 function generateCoins(canvas, ctx) {
     const coinSize = 75;
-    const coinSpawnInterval = 1000;
+    const coinSpawnInterval = 500;
 
     for (let i = 0; i < 10; i++) {
         spawnCoin();
@@ -60,6 +61,9 @@ function generateCoins(canvas, ctx) {
                     if (distance < playerSize / 2 + coin.size / 2) {
                         coin.collected = true;
                         score++;
+                        if (score > 0 && score % 10 === 0) {
+                            coinCollectedSound.play(); // Play coin collected sound for every 10 points
+                        }
                         return false; // remove the collected coin from the array
                     }
                 }
@@ -137,9 +141,9 @@ function gameOver() {
     ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${score}`, canvas.width * 0.4, canvas.height * 0.4);
 
-
     // Clear the coins array
     coins = [];
+
     // Play death sound
     deathSound.play();
 
@@ -166,6 +170,7 @@ function initializeGame() {
             x = canvas.width / 2 - playerSize / 2;
             y = canvas.height / 2 - playerSize / 2;
             score = 0;
+            coins = []; // Reset coins array when starting a new game
             enemy = getRandomPositionAwayFromPlayer();
             const { checkCoinCollision } = generateCoins(canvas, ctx);
             updateGame(checkCoinCollision);
@@ -184,12 +189,13 @@ function initializeGame() {
 function getRandomPositionAwayFromPlayer() {
     let enemyX, enemyY;
     do {
-        enemyX = Math.random() * canvas    .width;
+        enemyX = Math.random() * canvas.width;
         enemyY = Math.random() * canvas.height;
     } while (Math.abs(enemyX - x) < 200 && Math.abs(enemyY - y) < 200);
     return { x: enemyX, y: enemyY, size: enemy.size, speed: enemy.speed };
 }
 
+// Event listeners for player movement
 function handleKeyDown(e) {
     if (e.code === 'KeyD') vxr = 10;
     if (e.code === 'KeyA') vxl = -10;
@@ -204,9 +210,10 @@ function handleKeyUp(e) {
     if (e.code === 'KeyS') vy = 0;
 }
 
+// Initialize the game when the window finishes loading
 window.onload = function() {
     initializeGame();
 };
 
-initializeGame(); // Call initializeGame() to start the game on page load
-
+// Call initializeGame() directly to start the game immediately on page load
+initializeGame();
