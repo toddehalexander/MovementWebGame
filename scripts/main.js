@@ -201,13 +201,33 @@ function handleKeyDown(e) {
     if (e.code === 'KeyA') vxl = -10;
     if (e.code === 'KeyW') vy = -10;
     if (e.code === 'KeyS') vy = 10;
+
+    // Normalize the velocity vector to prevent increased speed when moving diagonally
+    normalizeVelocity();
 }
 
 function handleKeyUp(e) {
-    if (e.code === 'KeyD') vxr = 0;
-    if (e.code === 'KeyA') vxl = 0;
-    if (e.code === 'KeyW') vy = 0;
-    if (e.code === 'KeyS') vy = 0;
+    if (e.code === 'KeyD' && vxr > 0) vxr = 0;
+    if (e.code === 'KeyA' && vxl < 0) vxl = 0;
+    if (e.code === 'KeyW' && vy < 0) vy = 0;
+    if (e.code === 'KeyS' && vy > 0) vy = 0;
+
+    // Normalize the velocity vector
+    normalizeVelocity();
+}
+
+// Function to normalize the player's velocity vector
+function normalizeVelocity() {
+    // Calculate the magnitude of the velocity vector
+    const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+
+    // If the total speed exceeds the maximum allowed speed (10 in this case), adjust the components
+    if (speed > 10) {
+        const factor = 10 / speed; // Calculate scaling factor to bring speed down to 10
+        vxr *= factor;
+        vxl *= factor;
+        vy *= factor;
+    }
 }
 
 // Initialize the game when the window finishes loading
