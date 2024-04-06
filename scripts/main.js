@@ -41,7 +41,7 @@ function generateCoins(canvas, ctx) {
     for (let i = 0; i < 10; i++) {
         spawnCoin();
     }
-    setInterval(() => {
+    coinSpawnIntervalId = setInterval(() => {
         if (coins.length < 100) {
             spawnCoin();
         }
@@ -169,6 +169,9 @@ function gameOver() {
 
     // Clear the coins array
     coins = [];
+
+    clearInterval(coinSpawnIntervalId);
+    coinSpawnIntervalId = 0;
 
     // Play death sound
     deathSound.play();
