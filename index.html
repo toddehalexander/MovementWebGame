@@ -8,12 +8,29 @@
         canvas {
             border: 1px solid black;
         }
+        #gameCanvasContainer {
+            position: relative;
+        }
+        #gameMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="gameCanvasContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="gameMessage">
+            <p>Press OK or hit the space bar to start the game.</p>
+        </div>
+    </div>
     <script type="module" src="scripts/main.js"></script>
     <script type="module" src="scripts/coins.js"></script>
-    <script type="module" src="scripts/enemy.js"></script>
 </body>
 </html>

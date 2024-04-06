@@ -15,11 +15,6 @@ export function generateCoins(canvas, ctx) {
         coins.push({ x: coinX, y: coinY, size: coinSize, collected: false });
     }
 
-    // Spawn initial set of coins
-    for (let i = 0; i < 5; i++) {
-        spawnCoin();
-    }
-
     // Function to draw and update coins
     function updateCoins() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -37,7 +32,11 @@ export function generateCoins(canvas, ctx) {
     updateCoins();
 
     // Interval to spawn new coins every 3 seconds (adjust as needed)
-    const coinSpawnInterval = 3000;
+    const coinSpawnInterval = 1;
+        // Spawn initial set of coins
+        for (let i = 0; i < 5; i++) {
+            spawnCoin();
+        }
     setInterval(() => {
         for (let i = 0; i < 5; i++) {
             spawnCoin();
