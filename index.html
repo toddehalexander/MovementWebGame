@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/styles.css"> <!-- Assuming this is the correct path to your CSS file -->
+    <link rel="stylesheet" href="css/styles.css"> <!-- Include your CSS file if needed -->
     <title>Simple Movement Game</title>
 </head>
 <body>
@@ -14,7 +14,12 @@
         </div>
     </div>
 
+    <!-- Audio element for background music -->
+    <audio id="bgMusic" loop>
+        <source src="audio/GameTheme.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     <!-- Include scripts using defer to ensure they execute after the DOM has loaded -->
-    <script defer src="scripts/main.js" type="module"></script>
+    <script defer src="scripts/main.js"></script> <!-- Include your main.js script -->
 </body>
 </html>

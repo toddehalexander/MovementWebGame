@@ -20,6 +20,10 @@ let enemy = {
     speed: 3
 };
 
+// Create an audio element for background music
+const bgMusic = document.getElementById('bgMusic');
+bgMusic.loop = true;
+
 function generateCoins(canvas, ctx) {
     const coinSize = 75;
     const coinSpawnInterval = 500;
@@ -70,7 +74,7 @@ function updateGame(checkCoinCollision) {
     if (x + playerSize > canvas.width) x = canvas.width - playerSize;
     if (y < 0) y = 0;
     if (y + playerSize > canvas.height) y = canvas.height - playerSize;
-    ctx.fillStyle = 'orange'; 
+    ctx.fillStyle = 'orange';
     ctx.fillRect(x, y, playerSize, playerSize);
 
     // Move enemy towards the player
@@ -134,15 +138,18 @@ function gameOver() {
     ctx.font = `${canvas.width * 0.03}px Arial`;
     ctx.fillText('Press Spacebar to Play Again', canvas.width * 0.32, canvas.height * 0.7);
 
-    // Reset coins array to remove all coins from the screen
-    coins = [];
+    // Pause background music & reset to 0 seconds
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
 }
-
-
 
 function initializeGame() {
     const gameMessage = document.getElementById('gameMessage');
     gameMessage.style.display = 'block';
+
+    // Reload the background music to start from the beginning
+    bgMusic.load();
+
     window.addEventListener('keydown', function(e) {
         if (e.code === 'Space' && !gameStarted) {
             gameStarted = true;
@@ -153,8 +160,14 @@ function initializeGame() {
             enemy = getRandomPositionAwayFromPlayer();
             const { checkCoinCollision } = generateCoins(canvas, ctx);
             updateGame(checkCoinCollision);
+
+            // Restart background music from the beginning
+            bgMusic.play()
+                .then(() => console.log('Background music started'))
+                .catch(error => console.error('Failed to start background music:', error));
         }
     });
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 }
