@@ -13,20 +13,13 @@ const playerSize = 100;
 let score = 0;
 let coins = [];
 let gameStarted = false;
-let enemy = {
-    x: 0,
-    y: 0,
-    size: 80,
-    speed: 3,
-    vx: 0,
-    vy: 0
-};
+let enemies = [];
+let enemySpeed = 3;
 
 // Create an audio element for background music
 const bgMusic = document.getElementById('bgMusic');
 bgMusic.loop = true;
 bgMusic.volume = 0.1;
-
 
 // Create audio elements for game sounds
 const deathSound = new Audio('audio/Death.mp3');
@@ -69,6 +62,8 @@ function generateCoins(canvas, ctx) {
                         score++;
                         if (score > 0 && score % 10 === 0) {
                             coinCollectedSound.play(); // Play coin collected sound for every 10 points
+                            spawnEnemies(Math.floor(score / 10)); // Spawn enemies based on score
+                            enemySpeed += 0.5; // Increase enemy speed
                         }
                         return false; // remove the collected coin from the array
                     }
@@ -90,37 +85,28 @@ function updateGame(checkCoinCollision) {
     ctx.fillStyle = 'orange';
     ctx.fillRect(x, y, playerSize, playerSize);
 
+    // Move existing enemies towards the player
+    if (gameStarted) {
+        enemies.forEach((enemy) => {
+            const dx = x - enemy.x;
+            const dy = y - enemy.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
+            if (distance !== 0) {
+                enemy.vx = (dx / distance) * enemySpeed;
+                enemy.vy = (dy / distance) * enemySpeed;
 
-    function normalizeEnemyVelocity(enemy) {
-        const speed = Math.sqrt(enemy.vx * enemy.vx + enemy.vy * enemy.vy);
-        if (speed > enemy.speed) {
-            const factor = enemy.speed / speed;
-            enemy.vx *= factor;
-            enemy.vy *= factor;
-        }
+                enemy.x += enemy.vx;
+                enemy.y += enemy.vy;
+
+                // Normalize enemy velocity
+                normalizeEnemyVelocity(enemy);
+            }
+        });
     }
-// Move enemy towards the player
-if (gameStarted) {
-    const dx = x - enemy.x;
-    const dy = y - enemy.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance !== 0) {
-        enemy.vx = (dx / distance) * enemy.speed;
-        enemy.vy = (dy / distance) * enemy.speed;
-
-        enemy.x += enemy.vx;
-        enemy.y += enemy.vy;
-
-        // Normalize enemy velocity
-        normalizeEnemyVelocity(enemy);
-    }
-}
-
-    // Draw the enemy
-    ctx.fillStyle = 'red';
-    ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+    // Draw all enemies
+    drawEnemies();
 
     coins.forEach((coin) => {
         if (!coin.collected) {
@@ -134,8 +120,8 @@ if (gameStarted) {
 
     checkCoinCollision(x, y, playerSize);
 
-    // Check collision with the enemy
-    if (Math.abs(x - enemy.x) < playerSize && Math.abs(y - enemy.y) < playerSize) {
+    // Check collision with any enemy
+    if (checkEnemyCollision()) {
         gameOver();
         return;
     }
@@ -151,6 +137,39 @@ if (gameStarted) {
     requestAnimationFrame(() => updateGame(checkCoinCollision));
 }
 
+function normalizeEnemyVelocity(enemy) {
+    const speed = Math.sqrt(enemy.vx * enemy.vx + enemy.vy * enemy.vy);
+    if (speed > enemySpeed) {
+        const factor = enemySpeed / speed;
+        enemy.vx *= factor;
+        enemy.vy *= factor;
+    }
+}
+
+function spawnEnemies(count) {
+    for (let i = 0; i < count; i++) {
+        let newEnemy = getRandomPositionAwayFromPlayer();
+        enemies.push({ ...newEnemy, speed: enemySpeed });
+    }
+}
+
+function drawEnemies() {
+    enemies.forEach((enemy) => {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+    });
+}
+
+function checkEnemyCollision() {
+    for (let i = 0; i < enemies.length; i++) {
+        const enemy = enemies[i];
+        if (Math.abs(x - enemy.x) < playerSize && Math.abs(y - enemy.y) < playerSize) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function gameOver() {
     gameStarted = false;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -159,7 +178,7 @@ function gameOver() {
     ctx.fillStyle = 'red';
     ctx.font = `${canvas.width * 0.1}px Arial`;
 
-    // Display "Game Over!" message at the top
+    // Display "Game Over!" message
     ctx.fillText('Game Over!', canvas.width * 0.25, canvas.height * 0.3);
 
     // Display player's score below the "Game Over!" message
@@ -169,6 +188,10 @@ function gameOver() {
 
     // Clear the coins array
     coins = [];
+
+    // Reset enemies array and enemy speed
+    enemies = [];
+    enemySpeed = 3;
 
     clearInterval(coinSpawnIntervalId);
     coinSpawnIntervalId = 0;
@@ -200,7 +223,9 @@ function initializeGame() {
             y = canvas.height / 2 - playerSize / 2;
             score = 0;
             coins = []; // Reset coins array when starting a new game
-            enemy = getRandomPositionAwayFromPlayer();
+            enemies = []; // Reset enemies array
+            enemySpeed = 3; // Reset enemy speed
+            spawnEnemies(1); // Spawn initial enemy
             const { checkCoinCollision } = generateCoins(canvas, ctx);
             updateGame(checkCoinCollision);
 
@@ -221,10 +246,9 @@ function getRandomPositionAwayFromPlayer() {
         enemyX = Math.random() * canvas.width;
         enemyY = Math.random() * canvas.height;
     } while (Math.abs(enemyX - x) < 200 && Math.abs(enemyY - y) < 200);
-    return { x: enemyX, y: enemyY, size: enemy.size, speed: enemy.speed };
+    return { x: enemyX, y: enemyY, size: 80 };
 }
 
-// Event listeners for player movement
 function handleKeyDown(e) {
     if (e.code === 'KeyD') vxr = 10;
     if (e.code === 'KeyA') vxl = -10;
@@ -245,14 +269,10 @@ function handleKeyUp(e) {
     normalizeVelocity();
 }
 
-// Function to normalize the player's velocity vector
 function normalizeVelocity() {
-    // Calculate the magnitude of the velocity vector
     const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
-
-    // If the total speed exceeds the maximum allowed speed (10 in this case), adjust the components
-    if (speed > 11) {
-        const factor = 10 / speed; // Calculate scaling factor to bring speed down to 10
+    if (speed > 10) {
+        const factor = 10 / speed;
         vxr *= factor;
         vxl *= factor;
         vy *= factor;
@@ -263,6 +283,3 @@ function normalizeVelocity() {
 window.onload = function() {
     initializeGame();
 };
-
-// Call initializeGame() directly to start the game immediately on page load
-initializeGame();
