@@ -14,10 +14,14 @@ let score = 0;
 let coins = [];
 
 function generateCoins(canvas, ctx) {
-    const coinSize = 50;
-    const coinSpawnInterval = 3000;
+    const coinSize = 75;
+    const coinSpawnInterval = 500;
+
+    for (let i = 0; i < 10; i++) {
+        spawnCoin();
+    }
     setInterval(() => {
-        if (coins.length < 50) {
+        if (coins.length < 100) {
             spawnCoin();
         }
     }, coinSpawnInterval);
@@ -30,7 +34,7 @@ function generateCoins(canvas, ctx) {
 
     return {
         checkCoinCollision: (playerX, playerY, playerSize) => {
-            coins.forEach((coin, index) => {
+            coins = coins.filter((coin, index) => {
                 if (!coin.collected) {
                     let coinCenterX = coin.x + coin.size / 2;
                     let coinCenterY = coin.y + coin.size / 2;
@@ -42,8 +46,10 @@ function generateCoins(canvas, ctx) {
                     if (distance < playerSize / 2 + coin.size / 2) {
                         coin.collected = true;
                         score++;
+                        return false; // remove the collected coin from the array
                     }
                 }
+                return true; // keep the uncollected coins
             });
         }
     };
@@ -103,10 +109,10 @@ function initializeGame() {
 }
 
 function handleKeyDown(e) {
-    if (e.code === 'KeyD') vxr = 5;
-    if (e.code === 'KeyA') vxl = -5;
-    if (e.code === 'KeyW') vy = -5;
-    if (e.code === 'KeyS') vy = 5;
+    if (e.code === 'KeyD') vxr = 10;
+    if (e.code === 'KeyA') vxl = -10;
+    if (e.code === 'KeyW') vy = -10;
+    if (e.code === 'KeyS') vy = 10;
 }
 
 function handleKeyUp(e) {
