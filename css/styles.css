@@ -1,0 +1,21 @@
+canvas {
+    border: 1px solid black;
+}
+#gameCanvasContainer {
+    position: relative;
+}
+#gameMessage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    display: none;
+}
+#gameCanvas {
+    width: 90vw; /* 75% of the viewport width */
+    display: block; /* Ensures the canvas is displayed as a block element */
+    margin: auto; /* Centers the canvas horizontally within its container */
+}
+

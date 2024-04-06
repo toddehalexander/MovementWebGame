@@ -1,106 +1,121 @@
-// main.js
-
-// Import functions from other modules
-import { generateCoins } from './coins.js'; // Import generateCoins (includes coins and checkCoinCollision)
-
-// Get the canvas element and its 2D rendering context
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Initialize player variables
-let x = canvas.width / 2 - 25; // Player's initial x position
-let y = canvas.height / 2 - 25; // Player's initial y position
-let vxr = 0; // Horizontal velocity (right)
-let vxl = 0; // Horizontal velocity (left)
-let vy = 0; // Vertical velocity
-const playerSize = 50; // Size of the player
+canvas.width = 2560;
+canvas.height = 1440;
 
-// Initialize score
+let x = canvas.width / 2 - 25;
+let y = canvas.height / 2 - 25;
+let vxr = 0;
+let vxl = 0;
+let vy = 0;
+const playerSize = 100;
 let score = 0;
+let coins = [];
 
-// Function to initialize the game
-function initializeGame() {
-    // Display start message inside the canvas container
-    const gameMessage = document.getElementById('gameMessage');
-    gameMessage.style.display = 'block';
-
-    // Add event listener to start the game on space bar press
-    window.addEventListener('keydown', function(e) {
-        if (e.code === 'Space') {
-            // Hide the start message
-            gameMessage.style.display = 'none';
-
-            // Call generateCoins to initialize coins and checkCoinCollision
-            const { coins, checkCoinCollision } = generateCoins(canvas, ctx);
-
-            // Start the game loop
-            updateGame(coins, checkCoinCollision);
+function generateCoins(canvas, ctx) {
+    const coinSize = 50;
+    const coinSpawnInterval = 3000;
+    setInterval(() => {
+        if (coins.length < 50) {
+            spawnCoin();
         }
-    });
+    }, coinSpawnInterval);
 
-    // Event listeners for player movement
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    function spawnCoin() {
+        let coinX = Math.random() * (canvas.width - coinSize);
+        let coinY = Math.random() * (canvas.height - coinSize);
+        coins.push({ x: coinX, y: coinY, size: coinSize, collected: false });
+    }
+
+    return {
+        checkCoinCollision: (playerX, playerY, playerSize) => {
+            coins.forEach((coin, index) => {
+                if (!coin.collected) {
+                    let coinCenterX = coin.x + coin.size / 2;
+                    let coinCenterY = coin.y + coin.size / 2;
+                    let playerCenterX = playerX + playerSize / 2;
+                    let playerCenterY = playerY + playerSize / 2;
+                    let dx = coinCenterX - playerCenterX;
+                    let dy = coinCenterY - playerCenterY;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < playerSize / 2 + coin.size / 2) {
+                        coin.collected = true;
+                        score++;
+                    }
+                }
+            });
+        }
+    };
 }
 
-// Event handler for key down events (player movement)
-function handleKeyDown(e) {
-    if (e.code === 'KeyD') vxr = 5; // Move right
-    if (e.code === 'KeyA') vxl = -5; // Move left
-    if (e.code === 'KeyW') vy = -5; // Move up
-    if (e.code === 'KeyS') vy = 5; // Move down
-}
-
-// Event handler for key up events (stop player movement)
-function handleKeyUp(e) {
-    if (e.code === 'KeyD') vxr = 0; // Stop moving right
-    if (e.code === 'KeyA') vxl = 0; // Stop moving left
-    if (e.code === 'KeyW') vy = 0; // Stop moving up
-    if (e.code === 'KeyS') vy = 0; // Stop moving down
-}
-
-// Function to update the game state
-function updateGame(coins, checkCoinCollision) {
+function updateGame(checkCoinCollision) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Update player position based on velocity
     x += vxr + vxl;
     y += vy;
-
-    // Keep player within canvas boundaries
     if (x < 0) x = 0;
     if (x + playerSize > canvas.width) x = canvas.width - playerSize;
     if (y < 0) y = 0;
     if (y + playerSize > canvas.height) y = canvas.height - playerSize;
-
-    // Draw the player
     ctx.fillStyle = 'orange';
     ctx.fillRect(x, y, playerSize, playerSize);
 
-    // Draw and update coins
     coins.forEach((coin) => {
         if (!coin.collected) {
+            ctx.beginPath();
+            ctx.arc(coin.x + coin.size / 2, coin.y + coin.size / 2, coin.size / 2, 0, Math.PI * 2);
             ctx.fillStyle = 'yellow';
-            ctx.fillRect(coin.x, coin.y, coin.size, coin.size);
+            ctx.fill();
+            ctx.closePath();
         }
     });
 
-    // Check for player-coin collisions
-    checkCoinCollision(x, y, playerSize, coins);
+    checkCoinCollision(x, y, playerSize);
 
-    // Update score based on collected coins
-    score = coins.filter((coin) => coin.collected).length;
-
-    // Display score at the top of the screen
+    ctx.font = `${canvas.width * 0.03}px Arial`;
+    const textWidth = ctx.measureText('Score: ' + score).width;
+    const centerX = canvas.width / 2;
+    const textX = centerX - textWidth / 2;
+    const textY = canvas.height - canvas.width * 0.03;
     ctx.fillStyle = 'black';
-    ctx.font = '24px Arial';
-    ctx.fillText('Score: ' + score, 20, 30);
+    ctx.fillText('Score: ' + score, textX, textY);
 
-    // Request the next frame
-    requestAnimationFrame(() => updateGame(coins, checkCoinCollision));
+    requestAnimationFrame(() => updateGame(checkCoinCollision));
+}
+let gameStarted = false; // Add this line at the beginning of your script
+
+function initializeGame() {
+    const gameMessage = document.getElementById('gameMessage');
+    gameMessage.style.display = 'block';
+    window.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' && !gameStarted) { // Check if the game has started
+            gameStarted = true; // Set gameStarted to true when the game starts
+            gameMessage.style.display = 'none';
+            x = canvas.width / 2 - playerSize / 2;
+            y = canvas.height / 2 - playerSize / 2;
+            score = 0;
+            const { checkCoinCollision } = generateCoins(canvas, ctx);
+            updateGame(checkCoinCollision);
+        }
+    });
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 }
 
-// Start the game when the window is loaded
+function handleKeyDown(e) {
+    if (e.code === 'KeyD') vxr = 5;
+    if (e.code === 'KeyA') vxl = -5;
+    if (e.code === 'KeyW') vy = -5;
+    if (e.code === 'KeyS') vy = 5;
+}
+
+function handleKeyUp(e) {
+    if (e.code === 'KeyD') vxr = 0;
+    if (e.code === 'KeyA') vxl = 0;
+    if (e.code === 'KeyW') vy = 0;
+    if (e.code === 'KeyS') vy = 0;
+}
+
 window.onload = function() {
-    initializeGame(); // Initialize the game
+    initializeGame();
 };
