@@ -17,7 +17,9 @@ let enemy = {
     x: 0,
     y: 0,
     size: 80,
-    speed: 3
+    speed: 3,
+    vx: 0,
+    vy: 0
 };
 
 // Create an audio element for background music
@@ -84,13 +86,33 @@ function updateGame(checkCoinCollision) {
     ctx.fillStyle = 'orange';
     ctx.fillRect(x, y, playerSize, playerSize);
 
-    // Move enemy towards the player
-    if (gameStarted) {
-        if (x < enemy.x) enemy.x -= enemy.speed;
-        if (x > enemy.x) enemy.x += enemy.speed;
-        if (y < enemy.y) enemy.y -= enemy.speed;
-        if (y > enemy.y) enemy.y += enemy.speed;
+
+
+    function normalizeEnemyVelocity(enemy) {
+        const speed = Math.sqrt(enemy.vx * enemy.vx + enemy.vy * enemy.vy);
+        if (speed > enemy.speed) {
+            const factor = enemy.speed / speed;
+            enemy.vx *= factor;
+            enemy.vy *= factor;
+        }
     }
+// Move enemy towards the player
+if (gameStarted) {
+    const dx = x - enemy.x;
+    const dy = y - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance !== 0) {
+        enemy.vx = (dx / distance) * enemy.speed;
+        enemy.vy = (dy / distance) * enemy.speed;
+
+        enemy.x += enemy.vx;
+        enemy.y += enemy.vy;
+
+        // Normalize enemy velocity
+        normalizeEnemyVelocity(enemy);
+    }
+}
 
     // Draw the enemy
     ctx.fillStyle = 'red';
