@@ -24,9 +24,12 @@ let enemy = {
 const bgMusic = document.getElementById('bgMusic');
 bgMusic.loop = true;
 
+// Create an audio element for death sound
+const deathSound = new Audio('audio/Death.mp3');
+
 function generateCoins(canvas, ctx) {
     const coinSize = 75;
-    const coinSpawnInterval = 500;
+    const coinSpawnInterval = 1000;
 
     for (let i = 0; i < 10; i++) {
         spawnCoin();
@@ -134,6 +137,12 @@ function gameOver() {
     ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${score}`, canvas.width * 0.4, canvas.height * 0.4);
 
+
+    // Clear the coins array
+    coins = [];
+    // Play death sound
+    deathSound.play();
+
     // Display "Press Spacebar to Play Again" instruction at the bottom
     ctx.font = `${canvas.width * 0.03}px Arial`;
     ctx.fillText('Press Spacebar to Play Again', canvas.width * 0.32, canvas.height * 0.7);
@@ -175,7 +184,7 @@ function initializeGame() {
 function getRandomPositionAwayFromPlayer() {
     let enemyX, enemyY;
     do {
-        enemyX = Math.random() * canvas.width;
+        enemyX = Math.random() * canvas    .width;
         enemyY = Math.random() * canvas.height;
     } while (Math.abs(enemyX - x) < 200 && Math.abs(enemyY - y) < 200);
     return { x: enemyX, y: enemyY, size: enemy.size, speed: enemy.speed };
@@ -198,3 +207,6 @@ function handleKeyUp(e) {
 window.onload = function() {
     initializeGame();
 };
+
+initializeGame(); // Call initializeGame() to start the game on page load
+
