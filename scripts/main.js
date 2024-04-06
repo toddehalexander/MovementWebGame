@@ -25,10 +25,14 @@ let enemy = {
 // Create an audio element for background music
 const bgMusic = document.getElementById('bgMusic');
 bgMusic.loop = true;
+bgMusic.volume = 0.1;
+
 
 // Create audio elements for game sounds
 const deathSound = new Audio('audio/Death.mp3');
+deathSound.volume = 0.1;
 const coinCollectedSound = new Audio('audio/CoinCollected.mp3');
+coinCollectedSound.volume = 0.1;
 
 function generateCoins(canvas, ctx) {
     const coinSize = 75;
