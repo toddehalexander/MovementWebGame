@@ -251,7 +251,7 @@ function normalizeVelocity() {
     const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
 
     // If the total speed exceeds the maximum allowed speed (10 in this case), adjust the components
-    if (speed > 10) {
+    if (speed > 11) {
         const factor = 10 / speed; // Calculate scaling factor to bring speed down to 10
         vxr *= factor;
         vxl *= factor;
