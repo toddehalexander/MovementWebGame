@@ -100,7 +100,7 @@ function updateGame(checkCoinCollision) {
                 enemy.y += enemy.vy;
 
                 // Normalize enemy velocity
-                normalizeEnemyVelocity(enemy);
+                //normalizeEnemyVelocity(enemy);
             }
         });
     }
@@ -255,8 +255,11 @@ function handleKeyDown(e) {
     if (e.code === 'KeyW') vy = -10;
     if (e.code === 'KeyS') vy = 10;
 
-    // Normalize the velocity vector to prevent increased speed when moving diagonally
-    normalizeVelocity();
+    // Normalize the velocity vector if the total speed exceeds 10
+    const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+    if (speed > 10) {
+        normalizeVelocity();
+    }
 }
 
 function handleKeyUp(e) {
@@ -265,12 +268,16 @@ function handleKeyUp(e) {
     if (e.code === 'KeyW' && vy < 0) vy = 0;
     if (e.code === 'KeyS' && vy > 0) vy = 0;
 
-    // Normalize the velocity vector
-    normalizeVelocity();
+    // Normalize the velocity vector if the total speed exceeds 10
+    const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+    if (speed > 10) {
+        normalizeVelocity();
+    }
 }
 
 function normalizeVelocity() {
     const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+    console.log('Speed:', speed);
     if (speed > 10) {
         const factor = 10 / speed;
         vxr *= factor;
