@@ -1,8 +1,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 2560;
-canvas.height = 1440;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 let x = canvas.width / 2 - 25;
 let y = canvas.height / 2 - 25;
@@ -256,10 +256,10 @@ function handleKeyDown(e) {
     if (e.code === 'KeyS') vy = 10;
 
     // Normalize the velocity vector if the total speed exceeds 10
-    const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
-    if (speed > 10) {
-        normalizeVelocity();
-    }
+    // const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+    // if (speed > 10) {
+    //     normalizeVelocity();
+    // }
 }
 
 function handleKeyUp(e) {
@@ -269,22 +269,22 @@ function handleKeyUp(e) {
     if (e.code === 'KeyS' && vy > 0) vy = 0;
 
     // Normalize the velocity vector if the total speed exceeds 10
-    const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
-    if (speed > 10) {
-        normalizeVelocity();
-    }
+    // const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+    // if (speed > 10) {
+    //     normalizeVelocity();
+    // }
 }
 
-function normalizeVelocity() {
-    const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
-    console.log('Speed:', speed);
-    if (speed > 10) {
-        const factor = 10 / speed;
-        vxr *= factor;
-        vxl *= factor;
-        vy *= factor;
-    }
-}
+// function normalizeVelocity() {
+//     const speed = Math.sqrt(vxr * vxr + vxl * vxl + vy * vy);
+//     console.log('Speed:', speed);
+//     if (speed > 10) {
+//         const factor = 10 / speed;
+//         vxr *= factor;
+//         vxl *= factor;
+//         vy *= factor;
+//     }
+// }
 
 // Initialize the game when the window finishes loading
 window.onload = function() {
