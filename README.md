@@ -49,7 +49,7 @@ The project consists of the following key components:
 
 ### ⚙️ Setup
 
-Visit 
+Visit [https://toddehalexander.github.io/MovementWebGame/](https://toddehalexander.github.io/MovementWebGame/) to play the game!
 
 To run the game locally:
 
