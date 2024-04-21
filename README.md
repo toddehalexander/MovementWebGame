@@ -3,7 +3,7 @@
 Welcome to the documentation for the Simple Movement Game project. This document provides an overview of the game's functionality, structure, and how to interact with it.
 
 ### 🌟 Overview
-
+ 
 This project is a simple browser-based game where the player controls a character using the WASD keys to collect coins while avoiding enemies. The game is built using HTML5 Canvas for rendering graphics and JavaScript for game logic.
 
 ### 🎮 Features
